@@ -29,3 +29,6 @@ Everything is saved in that browser only.
 ## Hosting it (free)
 GitHub Pages serves this for $0 from a public repo. One ask before that: it would
 be live on the open web under your account, so it only happens on your say-so.
+
+## Live
+Served free by GitHub Pages.
