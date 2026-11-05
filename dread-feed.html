@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DREAD FEED</title>
+<style>
+:root{--bg:#050508;--panel:#101016;--panel2:#17171f;--red:#ff2a2a;--dim:#8b8b96;--text:#eceaf0;--cyan:#7ef0ff}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overscroll-behavior:none}
+#ageGate{position:fixed;inset:0;background:#000;z-index:60;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
+#ageGate .box{max-width:420px}
+#ageGate h1{font-size:32px;letter-spacing:6px;color:var(--red);margin-bottom:14px}
+#ageGate p{color:var(--dim);font-size:14px;line-height:1.6;margin-bottom:22px}
+button{font-family:inherit;cursor:pointer;border:0}
+.gate-btns{display:flex;gap:12px;justify-content:center}
+.gate-btns button{padding:12px 26px;border-radius:8px;font-weight:700;letter-spacing:1px}
+#enterBtn{background:var(--red);color:#fff}
+#leaveBtn{background:#1c1c24;color:var(--dim)}
+header{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(5,5,8,.94);border-bottom:1px solid #1b1b24}
+.logo{font-weight:900;letter-spacing:4px;color:var(--red);font-size:18px}
+.stats{display:flex;gap:14px;font-size:12px;color:var(--cyan);font-weight:700}
+main{max-width:520px;margin:0 auto;padding:14px 12px 30px;display:flex;flex-direction:column;gap:18px}
+.card{background:var(--panel);border:1px solid #1e1e28;border-radius:14px;overflow:hidden}
+.vwrap{position:relative;aspect-ratio:9/16;background:#000}
+video{width:100%;height:100%;object-fit:cover;display:block;background:#000}
+.novideo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:13px;text-align:center;padding:20px}
+.badges{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}
+.badge{font-size:11px;font-weight:700;padding:4px 9px;border-radius:20px;background:rgba(255,42,42,.85);color:#fff}
+.badge.shock{background:rgba(126,240,255,.85);color:#000}
+.lockover{position:absolute;inset:0;background:rgba(3,3,6,.84);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:16px}
+.lockover .lock{font-size:34px}
+.lockover p{font-size:13px;color:var(--dim);max-width:240px}
+.unlockbtn{background:var(--red);color:#fff;font-weight:800;padding:10px 22px;border-radius:8px}
+.meta{padding:12px 14px}
+.meta h2{font-size:15px;margin-bottom:2px}
+.meta .cat{font-size:10px;letter-spacing:2px;color:var(--red);font-weight:800;margin-bottom:8px}
+.meta .desc{font-size:12.5px;color:var(--dim);line-height:1.55;margin-bottom:10px}
+.warns{display:flex;flex-wrap:wrap;gap:6px}
+.warn{font-size:10px;font-weight:700;color:var(--red);background:rgba(255,42,42,.12);padding:3px 8px;border-radius:4px}
+.reactions{display:flex;justify-content:space-around;padding:10px 6px;border-top:1px solid #1e1e28}
+.reaction{background:var(--panel2);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:60px;color:var(--text)}
+.reaction .em{font-size:22px}
+.reaction .lb{font-size:9px;font-weight:800;letter-spacing:1px}
+.reaction.active{background:var(--red);color:#fff}
+footer{max-width:520px;margin:0 auto;padding:0 14px 40px;color:#55555e;font-size:11px;line-height:1.6;text-align:center}
+.modal{position:fixed;inset:0;z-index:50;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.78)}
+.modal.open{display:flex}
+.sheet{width:100%;max-width:520px;background:var(--panel);border-radius:18px 18px 0 0;padding:20px 18px 26px;position:relative}
+.sheet h3{font-size:17px;margin-bottom:6px;color:var(--red)}
+.sheet .sub{font-size:13px;color:var(--dim);line-height:1.6;margin-bottom:16px}
+.kofi{display:block;width:100%;padding:14px;border-radius:10px;background:#29abe2;color:#fff;font-weight:800;text-align:center;text-decoration:none;font-size:15px;margin-bottom:14px}
+.orline{display:flex;align-items:center;gap:10px;color:#55555e;font-size:11px;margin-bottom:12px}
+.orline::before,.orline::after{content:"";flex:1;height:1px;background:#22222c}
+.coderow{display:flex;gap:8px}
+.coderow input{flex:1;background:#0a0a10;border:1px solid #2a2a36;border-radius:10px;padding:12px;color:var(--text);font-size:14px;letter-spacing:2px;text-transform:uppercase}
+.coderow button{background:var(--red);color:#fff;border-radius:10px;padding:0 18px;font-weight:800}
+.err{color:var(--red);font-size:12px;margin-top:8px;display:none}
+.nope{margin-top:14px;text-align:center;color:#55555e;font-size:12px;background:none;width:100%}
+</style>
+</head>
+<body>
+
+<div id="ageGate">
+  <div class="box">
+    <h1>DREAD FEED</h1>
+    <p>Contains disturbing imagery, jump scares, gore and flashing effects. Viewer discretion advised. By entering you confirm you are 18 or older.</p>
+    <div class="gate-btns">
+      <button id="enterBtn">I AM 18+</button>
+      <button id="leaveBtn">LEAVE</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="logo">DREAD FEED</div>
+  <div class="stats">
+    <span id="rank">Novice Trembler</span>
+    <span id="coins">💀 0</span>
+  </div>
+</header>
+
+<main id="feed"></main>
+
+<footer>
+  Dread Feed is an independent horror project by Beautiful Chaos.<br>
+  All clips are the creator's original work. Support goes directly to the artist.
+</footer>
+
+<div class="modal" id="paywall">
+  <div class="sheet">
+    <h3>UNLOCK THE CLIP</h3>
+    <p class="sub" id="pwText">This clip is $0.99. Tap below to pay on Ko-fi, then enter the unlock code you receive to watch instantly.</p>
+    <a class="kofi" id="kofiBtn" href="#" target="_blank" rel="noopener">☕ Pay on Ko-fi</a>
+    <div class="orline">ALREADY PAID?</div>
+    <div class="coderow">
+      <input id="codeInput" placeholder="UNLOCK CODE" autocomplete="off">
+      <button id="codeBtn">UNLOCK</button>
+    </div>
+    <p class="err" id="codeErr">That code isn't valid for this clip. Check it and try again.</p>
+    <button class="nope" id="pwClose">not tonight</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// EDIT ONLY THIS BLOCK
+// ============================================================
+const CONFIG = {
+  // Your real Ko-fi page link goes here:
+  kofiLink: "https://ko-fi.com/bubblycouchsurfer",
+
+  // What a locked clip costs (display text only; Ko-fi handles the money):
+  priceLabel: "$0.99",
+
+  // How many clips play free before locking kicks in:
+  freeClips: 5,
+
+  // Unlock codes you hand out AFTER someone pays on Ko-fi.
+  // Change these to anything you like. Code -> which clip it opens ("any" opens everything).
+  unlockCodes: {
+    "NIGHTMARE1": "c6",
+    "NIGHTMARE2": "c7",
+    "NIGHTMARE3": "any"
+  }
+};
+
+// Your clips. Put your mp4/webm files in the same folder as this page
+// (or paste any video URL) and set src below. Leave src "" to show a placeholder.
+const CLIPS = [
+  { id:"c1", free:true,  src:"", title:"They Left The Door Open",  category:"COSMIC HORROR",  intensity:7, shock:6, warnings:["distress"],          desc:"Something waits at the end of the hall, and it has learned your routine." },
+  { id:"c2", free:true,  src:"", title:"3AM Delivery",             category:"JUMP SCARE",     intensity:8, shock:9, warnings:["jump scare","flashing"], desc:"The package was addressed to the last person who lived here. They never signed for it." },
+  { id:"c3", free:true,  src:"", title:"Smile For The Camera",     category:"PSYCHOLOGICAL", intensity:6, shock:5, warnings:["distress"],          desc:"A family camcorder tape. Every recording has one extra person in it." },
+  { id:"c4", free:true,  src:"", title:"The Hum",                  category:"SURREAL",        intensity:7, shock:4, warnings:["flashing"],          desc:"Nobody else in the building can hear it. Tonight it learned to knock." },
+  { id:"c5", free:true,  src:"", title:"Bathroom Stall 4",         category:"HAUNTED OBJECTS",intensity:5, shock:6, warnings:["blood"],             desc:"The writing on the wall changes when nobody is looking. Tonight somebody looked." },
+  { id:"c6", free:false, src:"", title:"It Follows You Home",      category:"POSSESSED",      intensity:9, shock:9, warnings:["gore","distress"],   desc:"It walks exactly one step behind you. It has never needed to hurry." },
+  { id:"c7", free:false, src:"", title:"Meat Puppet",              category:"BODY HORROR",    intensity:10,shock:10,warnings:["gore","mutilation"], desc:"The worst part isn't the movement. It's that the movements look practiced." },
+  { id:"c8", free:false, src:"", title:"The Last Puppet Show",     category:"PUPPET HORROR",  intensity:8, shock:9, warnings:["gore","distress"],   desc:"The puppeteer has been dead for six years. The show goes on every night." },
+];
+// ============================================================
+// End of the edit block. Everything below just works.
+// ============================================================
+
+const KEY = "dreadfeed_state_v1";
+let state = { coins:0, reacted:{}, unlocked:[], ageOk:false };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) state = Object.assign(state, s); } catch(e){}
+function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+
+const RANKS = [[0,"Novice Trembler"],[10,"Fear Apprentice"],[25,"Horror Veteran"],[50,"Master of Nightmares"]];
+function rank(n){ let r=RANKS[0][1]; for(const [t,name] of RANKS){ if(n>=t) r=name; } return r; }
+
+function isFree(c){ return c.free === true || CLIPS.indexOf(c) < CONFIG.freeClips; }
+function isUnlocked(c){ return isFree(c) || state.unlocked.includes(c.id) || state.unlocked.includes("any"); }
+
+const feed = document.getElementById("feed");
+let payClip = null;
+
+function render(){
+  feed.innerHTML = "";
+  CLIPS.forEach((c) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    const unlocked = isUnlocked(c);
+    let media;
+    if (c.src) {
+      media = document.createElement("video");
+      media.src = c.src; media.playsInline = true; media.loop = true; media.muted = true;
+      media.preload = "metadata"; media.controls = true;
+    } else {
+      media = document.createElement("div");
+      media.className = "novideo";
+      media.innerHTML = '<div style="font-size:40px;margin-bottom:10px">👁️</div>'
+        + '<div style="font-weight:800;letter-spacing:1px">' + c.title + '</div>'
+        + '<div style="font-size:11px;margin-top:8px;color:#55555e">clip coming soon</div>';
+    }
+    const vwrap = document.createElement("div");
+    vwrap.className = "vwrap";
+    vwrap.appendChild(media);
+    const badges = document.createElement("div");
+    badges.className = "badges";
+    badges.innerHTML = '<span class="badge">🔥 ' + c.intensity + '/10</span><span class="badge shock">⚡ ' + c.shock + '/10</span>';
+    vwrap.appendChild(badges);
+    if (!unlocked) {
+      const lock = document.createElement("div");
+      lock.className = "lockover";
+      lock.innerHTML = '<div class="lock">🔒</div><p>Locked. Watch this one for ' + CONFIG.priceLabel + ', yours to keep.</p>';
+      const btn = document.createElement("button");
+      btn.className = "unlockbtn";
+      btn.textContent = "UNLOCK " + CONFIG.priceLabel;
+      btn.addEventListener("click", () => openPaywall(c));
+      lock.appendChild(btn);
+      vwrap.appendChild(lock);
+    }
+    card.appendChild(vwrap);
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.innerHTML = '<h2>' + c.title + '</h2><div class="cat">' + c.category + '</div><div class="desc">' + c.desc + '</div>';
+    if (c.warnings && c.warnings.length) {
+      const w = document.createElement("div");
+      w.className = "warns";
+      c.warnings.forEach(x => { const t = document.createElement("span"); t.className = "warn"; t.textContent = x; w.appendChild(t); });
+      meta.appendChild(w);
+    }
+    card.appendChild(meta);
+
+    const rx = document.createElement("div");
+    rx.className = "reactions";
+    [["scream","😱","SCREAM"],["jump","🤸","JUMP"],["laugh","😂","LAUGH"],["fear","👻","FEAR"]].forEach(([k,em,lb]) => {
+      const b = document.createElement("button");
+      b.className = "reaction" + (state.reacted[c.id] === k ? " active" : "");
+      b.innerHTML = '<span class="em">' + em + '</span><span class="lb">' + lb + '</span>';
+      b.addEventListener("click", () => {
+        if (state.reacted[c.id]) return;
+        state.reacted[c.id] = k;
+        state.coins += 10;
+        save(); render();
+      });
+      rx.appendChild(b);
+    });
+    card.appendChild(rx);
+    feed.appendChild(card);
+  });
+  document.getElementById("coins").textContent = "💀 " + state.coins;
+  const reactions = Object.keys(state.reacted).length;
+  document.getElementById("rank").textContent = rank(reactions);
+}
+
+function openPaywall(c){
+  payClip = c;
+  document.getElementById("pwText").textContent = '"' + c.title + '" is ' + CONFIG.priceLabel + '. Tap below to pay on Ko-fi, then enter the unlock code you receive to watch instantly.';
+  document.getElementById("kofiBtn").href = CONFIG.kofiLink;
+  document.getElementById("codeErr").style.display = "none";
+  document.getElementById("codeInput").value = "";
+  document.getElementById("paywall").classList.add("open");
+}
+document.getElementById("pwClose").addEventListener("click", () => document.getElementById("paywall").classList.remove("open"));
+document.getElementById("codeBtn").addEventListener("click", () => {
+  const code = document.getElementById("codeInput").value.trim().toUpperCase();
+  const target = CONFIG.unlockCodes[code];
+  if (!target || (target !== "any" && target !== payClip.id)) {
+    document.getElementById("codeErr").style.display = "block";
+    return;
+  }
+  if (target === "any") { state.unlocked.push("any"); } else { state.unlocked.push(payClip.id); }
+  state.coins += 25;
+  save();
+  document.getElementById("paywall").classList.remove("open");
+  render();
+});
+
+document.getElementById("enterBtn").addEventListener("click", () => {
+  state.ageOk = true; save();
+  document.getElementById("ageGate").style.display = "none";
+});
+document.getElementById("leaveBtn").addEventListener("click", () => { document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#8b8b96;font-family:sans-serif">Come back when you are ready to be afraid.</div>'; });
+
+if (state.ageOk) document.getElementById("ageGate").style.display = "none";
+render();
+</script>
+</body>
+</html>
