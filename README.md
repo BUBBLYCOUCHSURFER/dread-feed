@@ -1,4 +1,4 @@
-# DREAD FEED (web, $0 build)
+# IN BETWEEN FEED (web, $0 build)
 
 One HTML file. No accounts, no backend, no monthly costs, no code installs.
 
